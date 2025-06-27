@@ -11,13 +11,19 @@ import {
   MdOutlineViewList,
   MdEdit,
 } from "react-icons/md";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import VideoCards from "./VideoCard";
 import ComplaintCards from "./ComplaintsCard";
 import SuggestionCards from "./SuggestionsCard";
+import UserForm from "./UserForm"; // ⬅️ Add this import
+import UserList from "./UserList";
+const MySwal = withReactContent(Swal);
 
 const AdminDashboard = () => {
   const [tab, setTab] = useState("videos");
   const [subTab, setSubTab] = useState("add");
+
   const [videoForm, setVideoForm] = useState({
     title: "",
     type: "",
@@ -35,11 +41,9 @@ const AdminDashboard = () => {
     formData.append("link", videoForm.link);
     formData.append("category", videoForm.category);
 
-    if (videoForm.notes && videoForm.notes.length > 0) {
-      Array.from(videoForm.notes).forEach((file) => {
-        formData.append("notes", file);
-      });
-    }
+    Array.from(videoForm.notes).forEach((file) => {
+      formData.append("notes", file);
+    });
 
     try {
       const response = await fetch(
@@ -49,10 +53,9 @@ const AdminDashboard = () => {
           body: formData,
         }
       );
-
       const data = await response.json();
       if (response.ok) {
-        alert("Video added successfully!");
+        Swal.fire("✅ Success", "Video added successfully!", "success");
         setVideoForm({
           title: "",
           type: "",
@@ -61,17 +64,17 @@ const AdminDashboard = () => {
           link: "",
         });
       } else {
-        alert("Error: " + (data?.error || "Something went wrong"));
+        Swal.fire("❌ Error", data?.error || "Something went wrong", "error");
       }
     } catch (error) {
-      console.error("Error uploading video:", error);
-      alert("Upload failed.");
+      console.error("Upload error:", error);
+      Swal.fire("❌ Error", "Failed to upload", "error");
     }
   };
 
   const renderSubContent = () => {
     if (tab === "videos") {
-      if (subTab === "add")
+      if (subTab === "add") {
         return (
           <form
             onSubmit={handleVideoSubmit}
@@ -85,7 +88,7 @@ const AdminDashboard = () => {
                 onChange={(e) =>
                   setVideoForm({ ...videoForm, title: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+                className="mt-1 block w-full px-4 py-2 border rounded-md"
                 required
               />
             </label>
@@ -98,7 +101,7 @@ const AdminDashboard = () => {
                 onChange={(e) =>
                   setVideoForm({ ...videoForm, type: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+                className="mt-1 block w-full px-4 py-2 border rounded-md"
               />
             </label>
 
@@ -110,25 +113,24 @@ const AdminDashboard = () => {
                 onChange={(e) =>
                   setVideoForm({ ...videoForm, category: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+                className="mt-1 block w-full px-4 py-2 border rounded-md"
               />
             </label>
 
             <label className="block">
-              <span className="text-gray-700">Video Link (YouTube etc)</span>
+              <span className="text-gray-700">Video Link</span>
               <input
                 type="url"
                 value={videoForm.link}
                 onChange={(e) =>
                   setVideoForm({ ...videoForm, link: e.target.value })
                 }
-                placeholder="https://youtube.com/watch?v=xyz"
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+                className="mt-1 block w-full px-4 py-2 border rounded-md"
               />
             </label>
 
             <label className="block">
-              <span className="text-gray-700">Notes (Upload multiple)</span>
+              <span className="text-gray-700">Notes (Upload Multiple)</span>
               <input
                 type="file"
                 multiple
@@ -141,78 +143,58 @@ const AdminDashboard = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#3b5bdd] text-white py-2 rounded-md hover:bg-[#2c45b7]"
+              className="w-full bg-[#3b5bdd] text-white py-2 rounded-md"
             >
               Submit
             </button>
           </form>
         );
-      if (subTab === "view") return <VideoCards />;
+      }
+      if (subTab === "view") return <VideoCards confirmDelete />;
     }
 
     if (tab === "users") {
-      if (subTab === "add") return <p>Add a new user to the system.</p>;
-      if (subTab === "view") return <p>Manage and view users.</p>;
-      if (subTab === "update") return <p>Update user info here.</p>;
+      if (subTab === "add") return <UserForm mode="add" />;
+      if (subTab === "update") return <UserForm mode="edit" />;
+      return <UserList />;
     }
 
     if (tab === "complaints") return <ComplaintCards />;
     if (tab === "suggestions") return <SuggestionCards />;
-
     return null;
   };
 
   const renderSubTabs = () => {
-    if (tab === "videos") {
-      return (
-        <div className="flex justify-center gap-4 mb-6">
-          {[
-            { key: "add", label: "Add", icon: <MdOutlineAddCircleOutline /> },
-            { key: "view", label: "View", icon: <MdOutlineViewList /> },
-          ].map(({ key, label, icon }) => (
-            <button
-              key={key}
-              onClick={() => setSubTab(key)}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-md border ${
-                subTab === key
-                  ? "bg-[#3b5bdd] text-white"
-                  : "bg-white text-gray-600"
-              }`}
-            >
-              {icon}
-              {label}
-            </button>
-          ))}
-        </div>
-      );
-    }
+    const common = [
+      { key: "add", label: "Add", icon: <MdOutlineAddCircleOutline /> },
+      { key: "view", label: "View", icon: <MdOutlineViewList /> },
+    ];
 
-    if (tab === "users") {
-      return (
-        <div className="flex justify-center gap-4 mb-6">
-          {[
-            { key: "add", label: "Add", icon: <MdOutlineAddCircleOutline /> },
-            { key: "view", label: "View", icon: <MdOutlineViewList /> },
-            { key: "update", label: "Update", icon: <MdEdit /> },
-          ].map(({ key, label, icon }) => (
-            <button
-              key={key}
-              onClick={() => setSubTab(key)}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-md border ${
-                subTab === key
-                  ? "bg-[#3b5bdd] text-white"
-                  : "bg-white text-gray-600"
-              }`}
-            >
-              {icon}
-              {label}
-            </button>
-          ))}
-        </div>
-      );
-    }
+    const userTabs = [
+      ...common,
+      { key: "update", label: "Update", icon: <MdEdit /> },
+    ];
 
-    return null;
+    const activeTabs = tab === "users" ? userTabs : common;
+
+    return (
+      <div className="flex justify-center gap-4 mb-6">
+        {activeTabs.map(({ key, label, icon }) => (
+          <button
+            key={key}
+            onClick={() => setSubTab(key)}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-md border ${
+              subTab === key
+                ? "bg-[#3b5bdd] text-white"
+                : "bg-white text-gray-600"
+            }`}
+          >
+            {icon}
+            {label}
+          </button>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -222,7 +204,7 @@ const AdminDashboard = () => {
           🛠️ Admin Dashboard
         </h1>
 
-        <div className="flex justify-center gap-4 flex-wrap mb-8">
+        <div className="flex justify-center gap-4 flex-wrap mb-6">
           {[
             { key: "videos", label: "Videos", icon: <FaVideo /> },
             { key: "users", label: "Users", icon: <FaUsers /> },
@@ -252,7 +234,7 @@ const AdminDashboard = () => {
         </div>
 
         {renderSubTabs()}
-        <div className="bg-white p-6 rounded-xl shadow-md min-h-[180px] text-center text-gray-800">
+        <div className="bg-white p-6 rounded-xl shadow-md min-h-[200px] text-gray-800">
           {renderSubContent()}
         </div>
       </div>

@@ -28,7 +28,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/admin-dashboard/AdminDashboard.jsx",
-    "src/app/dashboard/page.jsx"
+    "src/app/dashboard/page.jsx",
+    "src/app/admin-dashboard/UserForm.jsx",
+    "src/app/admin-dashboard/UserList.jsx"
   ],
   "exclude": ["node_modules"]
 }

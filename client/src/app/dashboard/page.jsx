@@ -23,6 +23,8 @@ export default function DashboardPage() {
     { label: "Projects", icon: <Folder size={18} /> },
     { label: "Complaints", icon: <MessageCircle size={18} /> },
     { label: "Suggestions", icon: <Lightbulb size={18} /> },
+    { label: "Review", icon: <MessageCircle size={18} /> }, // NEW
+    { label: "Payments", icon: <Folder size={18} /> }, // NEW
   ];
 
   useEffect(() => {
@@ -165,6 +167,27 @@ export default function DashboardPage() {
             icon={<Lightbulb size={24} />}
             color="yellow"
           />
+        );
+      case "Review":
+        return (
+          <div className="bg-white p-6 rounded-xl shadow-md text-center">
+            <p className="text-gray-600">
+              📝 This section will collect peer reviews, mentor feedback, and
+              self-assessments. Coming soon!
+            </p>
+          </div>
+        );
+
+      case "Payments":
+        return (
+          <div className="bg-white p-6 rounded-xl shadow-md text-center">
+            <p className="text-gray-600">
+              💳 Payment history and stipend details will appear here. <br />
+              <span className="text-blue-600 font-semibold">
+                Coming Soon...
+              </span>
+            </p>
+          </div>
         );
 
       default:
