@@ -11,6 +11,9 @@ import {
   MdOutlineViewList,
   MdEdit,
 } from "react-icons/md";
+import VideoCards from "./VideoCard";
+import ComplaintCards from "./ComplaintsCard";
+import SuggestionCards from "./SuggestionsCard";
 
 const AdminDashboard = () => {
   const [tab, setTab] = useState("videos");
@@ -18,15 +21,18 @@ const AdminDashboard = () => {
   const [videoForm, setVideoForm] = useState({
     title: "",
     type: "",
+    link: "",
     category: "",
     notes: [],
   });
+
   const handleVideoSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
     formData.append("title", videoForm.title);
     formData.append("type", videoForm.type);
+    formData.append("link", videoForm.link);
     formData.append("category", videoForm.category);
 
     if (videoForm.notes && videoForm.notes.length > 0) {
@@ -36,17 +42,26 @@ const AdminDashboard = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/videos", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_API_URL}api/videos/add`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
         alert("Video added successfully!");
-        setVideoForm({ title: "", type: "", category: "", notes: [] });
+        setVideoForm({
+          title: "",
+          type: "",
+          category: "",
+          notes: [],
+          link: "",
+        });
       } else {
-        alert("Error: " + data?.error || "Something went wrong");
+        alert("Error: " + (data?.error || "Something went wrong"));
       }
     } catch (error) {
       console.error("Error uploading video:", error);
@@ -100,6 +115,19 @@ const AdminDashboard = () => {
             </label>
 
             <label className="block">
+              <span className="text-gray-700">Video Link (YouTube etc)</span>
+              <input
+                type="url"
+                value={videoForm.link}
+                onChange={(e) =>
+                  setVideoForm({ ...videoForm, link: e.target.value })
+                }
+                placeholder="https://youtube.com/watch?v=xyz"
+                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+              />
+            </label>
+
+            <label className="block">
               <span className="text-gray-700">Notes (Upload multiple)</span>
               <input
                 type="file"
@@ -119,7 +147,7 @@ const AdminDashboard = () => {
             </button>
           </form>
         );
-      if (subTab === "view") return <p>List of uploaded videos.</p>;
+      if (subTab === "view") return <VideoCards />;
     }
 
     if (tab === "users") {
@@ -128,9 +156,8 @@ const AdminDashboard = () => {
       if (subTab === "update") return <p>Update user info here.</p>;
     }
 
-    if (tab === "complaints") return <p>View and resolve complaints here.</p>;
-    if (tab === "suggestions")
-      return <p>Read suggestions submitted by team members.</p>;
+    if (tab === "complaints") return <ComplaintCards />;
+    if (tab === "suggestions") return <SuggestionCards />;
 
     return null;
   };
@@ -225,7 +252,6 @@ const AdminDashboard = () => {
         </div>
 
         {renderSubTabs()}
-
         <div className="bg-white p-6 rounded-xl shadow-md min-h-[180px] text-center text-gray-800">
           {renderSubContent()}
         </div>
