@@ -42,7 +42,7 @@ const Contact = () => {
 
             <div className="flex gap-4 mt-6">
               <a
-                href="https://linkedin.com/company/triostack"
+                href="https://www.linkedin.com/company/triostack-technologies-private-limited/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -63,7 +63,7 @@ const Contact = () => {
                 <FaInstagram className="text-pink-600 text-2xl hover:scale-110 transition" />
               </a>
               <a
-                href="https://facebook.com/triostack"
+                href="https://www.facebook.com/profile.php?id=61577525619914"
                 target="_blank"
                 rel="noopener noreferrer"
               >

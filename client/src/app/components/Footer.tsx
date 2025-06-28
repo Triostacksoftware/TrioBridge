@@ -17,7 +17,7 @@ const Footer = () => {
         </p>
         <div className="flex space-x-4 mt-4 md:mt-0">
           <a
-            href="https://linkedin.com/company/triostack"
+            href="	https://www.linkedin.com/company/triostack-technologies-private-limited/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition"
@@ -33,7 +33,7 @@ const Footer = () => {
             GitHub
           </a>
           <a
-            href="https://instagram.com/triostack"
+            href="https://www.instagram.com/triostack/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition"
@@ -41,7 +41,7 @@ const Footer = () => {
             Instagram
           </a>
           <a
-            href="https://facebook.com/triostack"
+            href="https://www.facebook.com/profile.php?id=61577525619914"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-white transition"
