@@ -37,7 +37,15 @@ const Hero = () => {
             <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full shadow hover:scale-105 transition font-medium">
               Get Started
             </button>
-            <button className="border border-blue-600 text-blue-700 px-6 py-3 rounded-full hover:bg-blue-50 transition font-medium">
+            <button
+              className="border border-blue-600 text-blue-700 px-6 py-3 rounded-full hover:bg-blue-50 transition font-medium"
+              onClick={() =>
+                window.open(
+                  "https://www.youtube.com/watch?v=eVdOw2K-_b0",
+                  "_blank"
+                )
+              }
+            >
               Watch Demo
             </button>
           </div>
