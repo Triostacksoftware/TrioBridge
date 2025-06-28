@@ -4,10 +4,25 @@ import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import axios from "axios";
 const LoginHeader = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_APP_API_URL}api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      router.push("/login");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -49,10 +64,7 @@ const LoginHeader = () => {
           <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border border-gray-200 z-10">
             <button
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-              onClick={() => {
-                // handle logout here
-                console.log("Logging out...");
-              }}
+              onClick={handleLogout}
             >
               <LogOut size={16} />
               Logout
