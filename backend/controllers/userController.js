@@ -1,23 +1,35 @@
-import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import User from "../models/User.js"; // Adjust path as needed
 
-// 🔘 Add User
 export const addUser = async (req, res) => {
   try {
     const { eid, name, email, password, role, projects, review } = req.body;
-    console.log(eid);
+
+    // Check if password is provided
+    if (!password) {
+      return res.status(400).json({ error: "Password is required." });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const user = new User({
       eid,
       name,
       email,
-      password,
+      password: hashedPassword, // store hashed password
       role,
       projects: projects || [],
       review,
       documents: req.files?.map((f) => f.filename) || [],
     });
+
     await user.save();
+
     res.status(201).json({ message: "User added successfully", user });
   } catch (err) {
+    console.error("Error adding user:", err);
     res.status(400).json({ error: err.message });
   }
 };

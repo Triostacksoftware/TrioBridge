@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 const LoginHeader = () => {
   const [open, setOpen] = useState(false);

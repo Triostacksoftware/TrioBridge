@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateToken } from "../utils/generateToken.js";
+import { generateToken } from "../utility/generateToken.js";
 
 export const login = async (req, res) => {
   const { eid, password } = req.body;
@@ -17,25 +17,27 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.password && !(await bcrypt.compare(password, user.password))) {
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
       return res.status(401).json({ message: "Incorrect password" });
     }
 
-    const token = generateToken(user);
+    const token = generateToken(user); // Include only necessary fields in payload
 
+    // Set secure HttpOnly cookie
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production", // true in production (HTTPS)
         sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-        maxAge: 2 * 60 * 60 * 1000,
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
       })
       .status(200)
       .json({
         message: "Login successful",
-        role: user.role,
-        name: user.name,
         eid: user.eid,
+        name: user.name,
+        role: user.role,
       });
   } catch (error) {
     console.error("Login error:", error);

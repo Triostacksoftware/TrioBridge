@@ -11,7 +11,9 @@ export default function UserList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${API_URL}api/users/view`);
+        const res = await fetch(`${API_URL}api/users/view`, {
+          credentials: "include", // important for cookie auth
+        });
         const data = await res.json();
         setUsers(data);
       } catch (err) {
@@ -22,7 +24,7 @@ export default function UserList() {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (eid) => {
+  const handleDelete = async (_id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you really want to delete this user?",
@@ -36,12 +38,13 @@ export default function UserList() {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(`${API_URL}api/users/delete/${eid}`, {
+      const res = await fetch(`${API_URL}api/users/delete/${_id}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       if (res.ok) {
-        setUsers((prev) => prev.filter((u) => u.eid !== eid));
+        setUsers((prev) => prev.filter((u) => u._id !== _id));
         Swal.fire("Deleted!", "User has been removed.", "success");
       } else {
         Swal.fire("Error", "Failed to delete user.", "error");
@@ -61,7 +64,7 @@ export default function UserList() {
         <div className="space-y-4">
           {users.map((user) => (
             <div
-              key={user.eid}
+              key={user._id}
               className="flex justify-between items-center bg-white shadow-md p-4 rounded border"
             >
               <div>
@@ -72,7 +75,7 @@ export default function UserList() {
                 <p className="text-sm text-gray-400">Role: {user.role}</p>
               </div>
               <button
-                onClick={() => handleDelete(user.eid)}
+                onClick={() => handleDelete(user._id)}
                 className="text-red-500 text-xl hover:text-red-700"
                 title="Delete User"
               >

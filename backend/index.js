@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
-
+import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
@@ -12,17 +12,26 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://triobridge.triostack.in",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", // your local frontend
-      "https://triobridge.triostack.in", // production frontend domain
-    ],
-    credentials: true, // ✅ allow cookies and Authorization headers
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 app.use("/uploads", express.static("uploads"));
-
+app.use(cookieParser());
 app.use(express.json());
 
 app.get("/", (req, res) => {

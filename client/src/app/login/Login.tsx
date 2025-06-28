@@ -20,17 +20,20 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_APP_API_URL}/login`,
+        `${process.env.NEXT_PUBLIC_APP_API_URL}api/auth/login`,
         { eid, password },
         { withCredentials: true }
       );
 
       const { role, name } = response.data;
+
       toast.success(`Welcome ${name}!`);
 
       setTimeout(() => {
         if (role === "admin") router.push("/admin-dashboard");
-        else router.push("/dashboard");
+        else {
+          router.push("/dashboard");
+        }
       }, 1000);
     } catch (error: any) {
       const msg =
@@ -121,7 +124,7 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Employee Id
               </label>
               <input
@@ -129,11 +132,11 @@ const Login = () => {
                 value={eid}
                 onChange={(e) => setEid(e.target.value)}
                 required
-                className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
+                className="w-full text-black px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-black">
                 Password
               </label>
               <input
@@ -141,7 +144,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
+                className="w-full text-black px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
               />
             </div>
             <div className="flex justify-between items-center text-sm">
