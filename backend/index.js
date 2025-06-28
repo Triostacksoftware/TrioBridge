@@ -16,6 +16,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://triobridge.triostack.in",
+  "https://www.triobridge.triostack.in",
 ];
 
 app.use(

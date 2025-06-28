@@ -45,7 +45,7 @@ const Contact = () => {
             <div className="text-lg text-gray-700 flex items-center gap-3">
               <FaEnvelope className="text-blue-600" />
               <a href="mailto:hello@triostack.in" className="hover:underline">
-                hello@triostack.in
+                info@triostack.in
               </a>
             </div>
 
