@@ -8,10 +8,19 @@ import {
   FaFacebook,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
 
 const Contact = () => {
+  const handleSubmit = () => {
+    // Wait for Google to receive the form, then show message
+    setTimeout(() => {
+      toast.success("✅ Message sent successfully!");
+    }, 100);
+  };
+
   return (
     <section id="contact" className="py-20 bg-white px-6">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-blue-700 mb-4">
           Contact Our Team
@@ -22,7 +31,7 @@ const Contact = () => {
         </p>
 
         <div className="flex flex-col md:flex-row gap-12">
-          {/* Left: Contact Info */}
+          {/* Left Contact Info */}
           <div className="md:w-1/2 space-y-6">
             <div className="text-lg text-gray-700 flex items-start gap-3">
               <FaMapMarkerAlt className="text-blue-600 mt-1" />
@@ -44,50 +53,52 @@ const Contact = () => {
               <a
                 href="https://www.linkedin.com/company/triostack-technologies-private-limited/"
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 <FaLinkedin className="text-blue-700 text-2xl hover:scale-110 transition" />
               </a>
-              <a
-                href="https://github.com/Triostacksoftware"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://github.com/Triostacksoftware" target="_blank">
                 <FaGithub className="text-gray-800 text-2xl hover:scale-110 transition" />
               </a>
-              <a
-                href="https://instagram.com/triostack"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://instagram.com/triostack" target="_blank">
                 <FaInstagram className="text-pink-600 text-2xl hover:scale-110 transition" />
               </a>
               <a
                 href="https://www.facebook.com/profile.php?id=61577525619914"
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 <FaFacebook className="text-blue-600 text-2xl hover:scale-110 transition" />
               </a>
             </div>
           </div>
 
-          {/* Right: Contact Form */}
+          {/* Right Contact Form */}
           <div className="text-black md:w-1/2 bg-gray-50 p-8 rounded-xl shadow-md">
-            <form className="space-y-6">
+            <form
+              action="https://script.google.com/macros/s/AKfycbw2CqIrO67TCxTcipURlnF5IALtISWUru3UsPx-ISBT0TjwK90gI1W54M2LwOz9dqQu/exec"
+              method="POST"
+              target="hidden_iframe"
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
               <input
                 type="text"
+                name="name"
                 placeholder="Your Name"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="email"
+                name="email"
                 placeholder="Your Email"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <textarea
+                name="message"
                 placeholder="Your Message"
                 rows={5}
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></textarea>
               <button
@@ -96,6 +107,13 @@ const Contact = () => {
               >
                 Send Message
               </button>
+
+              {/* Hidden iframe prevents page reload */}
+              <iframe
+                name="hidden_iframe"
+                style={{ display: "none" }}
+                sandbox=""
+              ></iframe>
             </form>
           </div>
         </div>

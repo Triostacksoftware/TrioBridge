@@ -1,22 +1,56 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
 import { FaLinkedin, FaXTwitter, FaInstagram } from "react-icons/fa6";
 
 const Login = () => {
+  const [eid, setEid] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_APP_API_URL}/login`,
+        { eid, password },
+        { withCredentials: true }
+      );
+
+      const { role, name } = response.data;
+      toast.success(`Welcome ${name}!`);
+
+      setTimeout(() => {
+        if (role === "admin") router.push("/admin-dashboard");
+        else router.push("/dashboard");
+      }, 1000);
+    } catch (error: any) {
+      const msg =
+        error?.response?.data?.message || "Something went wrong. Try again.";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
+      <Toaster position="top-right" />
       {/* Left panel */}
-
       <div className="w-1/2 pb-5 hidden lg:flex flex-col justify-between bg-gradient-to-tr from-[#3a0ca3] via-[#7209b7] to-[#4361ee] text-white p-2 rounded-r-none ">
         <div className="flex flex-col items-center mt-3">
           <Image src={"/tb.png"} height={90} width={90} alt="tb" />
           <h2 className="text-5xl font-bold mt-4 leading-tight text-center max-w-3xl">
-            Welcome to
-            <span className="text-white"> Trio-Bridge</span>
+            Welcome to <span className="text-white">Trio-Bridge</span>
           </h2>
-
           <p className="text-base mt-2 text-center opacity-90 max-w-xl leading-8">
             Empower your teams to seamlessly manage interns, streamline
             onboarding, monitor training progress, and track performance
@@ -31,7 +65,6 @@ const Login = () => {
           />
         </div>
 
-        {/* Contact Info + Social */}
         <div className="text-sm mt-8 space-y-2 pl-3">
           <p className="flex items-center gap-2">
             📍 PLOT NO 20, H-1/A, Sector 63, Noida, UP – 201301
@@ -86,13 +119,15 @@ const Login = () => {
             </p>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Employee Id
               </label>
               <input
-                type="email"
+                type="text"
+                value={eid}
+                onChange={(e) => setEid(e.target.value)}
                 required
                 className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
               />
@@ -103,6 +138,8 @@ const Login = () => {
               </label>
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#5f0fff] focus:border-[#5f0fff]"
               />
@@ -121,9 +158,10 @@ const Login = () => {
             </div>
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-gradient-to-r from-[#7209b7] to-[#4361ee] text-white py-2 rounded-md font-medium shadow-md hover:opacity-90 transition"
             >
-              Login →
+              {loading ? "Logging in..." : "Login →"}
             </button>
           </form>
 

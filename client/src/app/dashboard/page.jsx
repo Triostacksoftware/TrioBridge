@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   FileText,
   Video,
@@ -9,13 +10,16 @@ import {
   Target,
   Lightbulb,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import LoginHeader from "../login/LoginHeader";
 import Footer from "../components/Footer";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("Documents");
   const [videoSubTab, setVideoSubTab] = useState("Tech");
   const [videos, setVideos] = useState([]);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const tabs = [
     { label: "Documents", icon: <FileText size={18} /> },
@@ -23,24 +27,53 @@ export default function DashboardPage() {
     { label: "Projects", icon: <Folder size={18} /> },
     { label: "Complaints", icon: <MessageCircle size={18} /> },
     { label: "Suggestions", icon: <Lightbulb size={18} /> },
-    { label: "Review", icon: <MessageCircle size={18} /> }, // NEW
-    { label: "Payments", icon: <Folder size={18} /> }, // NEW
+    { label: "Review", icon: <MessageCircle size={18} /> },
+    { label: "Payments", icon: <Folder size={18} /> },
   ];
 
+  // 🛡️ Check user login status
   useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_APP_API_URL}api/auth/isuser`,
+          { withCredentials: true }
+        );
+        if (!res.data?.user) {
+          router.replace("/login");
+        } else {
+          setAuthChecked(true);
+        }
+      } catch (error) {
+        router.replace("/login");
+      }
+    };
+    checkUser();
+  }, [router]);
+
+  // 📺 Fetch videos only after auth
+  useEffect(() => {
+    if (!authChecked) return;
     const fetchVideos = async () => {
       try {
-        const res = await fetch(
+        const res = await axios.get(
           `${process.env.NEXT_PUBLIC_APP_API_URL}api/videos/view`
         );
-        const data = await res.json();
-        setVideos(data || []);
+        setVideos(res.data || []);
       } catch (err) {
         console.error("Failed to fetch videos", err);
       }
     };
     fetchVideos();
-  }, []);
+  }, [authChecked]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        🔒 Verifying access...
+      </div>
+    );
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -59,32 +92,23 @@ export default function DashboardPage() {
             video.category?.toLowerCase() === videoSubTab.toLowerCase() &&
             video.type?.toLowerCase() !== "admin"
         );
-
         return (
           <div className="bg-white p-6 rounded-xl shadow-md">
             <div className="flex justify-center gap-4 mb-6">
-              <button
-                onClick={() => setVideoSubTab("Tech")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                  videoSubTab === "Tech"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Tech
-              </button>
-              <button
-                onClick={() => setVideoSubTab("Non-Tech")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                  videoSubTab === "Non-Tech"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Non-Tech
-              </button>
+              {["Tech", "Non-Tech"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setVideoSubTab(cat)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium ${
+                    videoSubTab === cat
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
-
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {filteredVideos.length > 0 ? (
                 filteredVideos.map((video) => (
@@ -108,7 +132,7 @@ export default function DashboardPage() {
                         ▶ Watch Video
                       </a>
                     )}
-                    {video.notes && video.notes.length > 0 && (
+                    {video.notes?.length > 0 && (
                       <div className="text-sm text-green-600 mt-2">
                         <strong>Notes:</strong>
                         <ul className="list-disc list-inside">
@@ -168,12 +192,13 @@ export default function DashboardPage() {
             color="yellow"
           />
         );
+
       case "Review":
         return (
           <div className="bg-white p-6 rounded-xl shadow-md text-center">
             <p className="text-gray-600">
               📝 This section will collect peer reviews, mentor feedback, and
-              self-assessments. Coming soon!
+              self-assessments.
             </p>
           </div>
         );
@@ -182,7 +207,8 @@ export default function DashboardPage() {
         return (
           <div className="bg-white p-6 rounded-xl shadow-md text-center">
             <p className="text-gray-600">
-              💳 Payment history and stipend details will appear here. <br />
+              💳 Payment history and stipend details will appear here.
+              <br />
               <span className="text-blue-600 font-semibold">
                 Coming Soon...
               </span>
@@ -226,88 +252,5 @@ export default function DashboardPage() {
       </section>
       <Footer />
     </>
-  );
-}
-
-// ✅ Feedback Form Component
-function FeedbackForm({ type, icon, color }) {
-  const [message, setMessage] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const themeColor =
-    color === "red"
-      ? "text-red-600 bg-red-100"
-      : color === "yellow"
-      ? "text-yellow-600 bg-yellow-100"
-      : "text-blue-600 bg-blue-100";
-
-  const handleSubmit = async () => {
-    if (!message.trim()) {
-      alert("Please write something before submitting.");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_API_URL}api/${type.toLowerCase()}s/add`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        setSubmitted(true);
-        setMessage("");
-      } else {
-        alert("Error: " + (data?.error || "Something went wrong"));
-      }
-    } catch (err) {
-      console.error("Submission error:", err);
-      alert("Failed to submit.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 max-w-3xl mx-auto text-gray-700">
-      <div className="flex items-start gap-4">
-        <div className={`${themeColor} p-3 rounded-full shadow-sm`}>{icon}</div>
-        <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-1">
-            Submit {type}
-          </h3>
-          <p className="text-gray-600 text-sm">
-            {type === "Complaint"
-              ? "Let us know what’s bothering you or how we can improve your experience."
-              : "Got an idea or feedback? We’d love to hear your thoughts!"}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 space-y-4">
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={`Describe your ${type.toLowerCase()}...`}
-          className="w-full h-28 rounded-md border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-[#3b5bdd] focus:outline-none"
-        />
-
-        <button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="bg-[#3b5bdd] text-white font-medium px-6 py-2 rounded-lg shadow hover:opacity-90 transition disabled:opacity-50"
-        >
-          {submitting ? "Submitting..." : submitted ? "Submitted ✓" : "Submit"}
-        </button>
-      </div>
-    </div>
   );
 }
