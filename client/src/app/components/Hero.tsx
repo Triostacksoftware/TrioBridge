@@ -43,8 +43,9 @@ const Hero = () => {
           </div>
 
           {/* Features */}
-          <div className="flex space-x-8 lg:space-x-20  mt-16 lg:mt-10 text-sm text-gray-600">
-            <div className="flex flex-col items-center ml-2">
+
+          <div className=" flex space-x-8 lg:space-x-20  mt-16 lg:mt-10 text-sm text-gray-600">
+            <div className="flex hidden lg:block flex-col items-center ml-2">
               <FaUsersCog className="text-blue-600 text-2xl mb-1" />
               On-Boarding
             </div>
