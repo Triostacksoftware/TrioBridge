@@ -10,6 +10,7 @@ import {
   Target,
   Lightbulb,
 } from "lucide-react";
+import FeedbackForm from "./FeedbackForm";
 import { useRouter } from "next/navigation";
 import LoginHeader from "../login/LoginHeader";
 import Footer from "../components/Footer";
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const [videoSubTab, setVideoSubTab] = useState("Tech");
   const [videos, setVideos] = useState([]);
   const [authChecked, setAuthChecked] = useState(false);
+  const [user, setUser] = useState(null);
 
   const tabs = [
     { label: "Documents", icon: <FileText size={18} /> },
@@ -31,7 +33,6 @@ export default function DashboardPage() {
     { label: "Payments", icon: <Folder size={18} /> },
   ];
 
-  // 🛡️ Check user login status
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -44,16 +45,36 @@ export default function DashboardPage() {
         } else {
           setAuthChecked(true);
         }
-      } catch (error) {
+      } catch {
         router.replace("/login");
       }
     };
     checkUser();
   }, [router]);
 
-  // 📺 Fetch videos only after auth
   useEffect(() => {
     if (!authChecked) return;
+
+    const fetchData = async () => {
+      try {
+        const userInfo = await axios.get(
+          `${process.env.NEXT_PUBLIC_APP_API_URL}api/auth/isuser`,
+          { withCredentials: true }
+        );
+
+        const allUsers = await axios.get(
+          `${process.env.NEXT_PUBLIC_APP_API_URL}api/users/view`
+        );
+
+        const found = allUsers.data.find(
+          (u) => u.eid === userInfo.data.user.eid
+        );
+        setUser(found || null);
+      } catch (err) {
+        console.error("User fetch failed", err);
+      }
+    };
+
     const fetchVideos = async () => {
       try {
         const res = await axios.get(
@@ -61,16 +82,18 @@ export default function DashboardPage() {
         );
         setVideos(res.data || []);
       } catch (err) {
-        console.error("Failed to fetch videos", err);
+        console.error("Video fetch failed", err);
       }
     };
+
+    fetchData();
     fetchVideos();
   }, [authChecked]);
 
-  if (!authChecked) {
+  if (!authChecked || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
-        🔒 Verifying access...
+        ⏳ Verifying user and loading data...
       </div>
     );
   }
@@ -79,18 +102,94 @@ export default function DashboardPage() {
     switch (activeTab) {
       case "Documents":
         return (
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <p className="text-gray-600">
-              📁 Upload or browse shared documents here.
-            </p>
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-bold text-indigo-600 mb-4 flex items-center gap-2">
+              <FileText size={22} /> Your Uploaded Documents
+            </h2>
+            {user.documents?.length > 0 ? (
+              <ul className="grid md:grid-cols-2 gap-3">
+                {user.documents.map((doc, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-center justify-between p-3 bg-gray-50 border rounded-lg hover:shadow transition"
+                  >
+                    <span className="text-gray-700 font-medium">
+                      📄 Document {idx + 1}
+                    </span>
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_APP_API_URL}uploads/${doc}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 underline hover:text-blue-800"
+                    >
+                      View
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No documents uploaded.</p>
+            )}
           </div>
+        );
+
+      case "Projects":
+        return (
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-bold text-green-600 mb-4 flex items-center gap-2">
+              <Folder size={22} /> Assigned Projects
+            </h2>
+            {user.projects?.length > 0 ? (
+              <ul className="space-y-2 list-disc list-inside text-gray-700">
+                {user.projects.map((p, i) => (
+                  <li key={i}>✅ {p}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No projects assigned.</p>
+            )}
+          </div>
+        );
+
+      case "Review":
+        return (
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-bold text-purple-600 mb-4 flex items-center gap-2">
+              <MessageCircle size={22} /> Your Review Summary
+            </h2>
+            {user.review ? (
+              <div className="text-gray-700 border-l-4 pl-4 border-purple-300">
+                {user.review}
+              </div>
+            ) : (
+              <p className="text-gray-500">No review recorded.</p>
+            )}
+          </div>
+        );
+
+      case "Complaints":
+        return (
+          <FeedbackForm
+            type="Complaint"
+            icon={<MessageCircle size={24} />}
+            color="red"
+          />
+        );
+
+      case "Suggestions":
+        return (
+          <FeedbackForm
+            type="Suggestion"
+            icon={<Lightbulb size={24} />}
+            color="yellow"
+          />
         );
 
       case "Videos":
         const filteredVideos = videos.filter(
-          (video) =>
-            video.category?.toLowerCase() === videoSubTab.toLowerCase() &&
-            video.type?.toLowerCase() !== "admin"
+          (v) =>
+            v.category?.toLowerCase() === videoSubTab.toLowerCase() &&
+            v.type?.toLowerCase() !== "admin"
         );
         return (
           <div className="bg-white p-6 rounded-xl shadow-md">
@@ -163,43 +262,6 @@ export default function DashboardPage() {
                 </p>
               )}
             </div>
-          </div>
-        );
-
-      case "Projects":
-        return (
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <p className="text-gray-600">
-              📊 Track your assigned projects here.
-            </p>
-          </div>
-        );
-
-      case "Complaints":
-        return (
-          <FeedbackForm
-            type="Complaint"
-            icon={<MessageCircle size={24} />}
-            color="red"
-          />
-        );
-
-      case "Suggestions":
-        return (
-          <FeedbackForm
-            type="Suggestion"
-            icon={<Lightbulb size={24} />}
-            color="yellow"
-          />
-        );
-
-      case "Review":
-        return (
-          <div className="bg-white p-6 rounded-xl shadow-md text-center">
-            <p className="text-gray-600">
-              📝 This section will collect peer reviews, mentor feedback, and
-              self-assessments.
-            </p>
           </div>
         );
 
