@@ -12,7 +12,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // your local frontend
+      "https://triobridge.triostack.in", // production frontend domain
+    ],
+    credentials: true, // ✅ allow cookies and Authorization headers
+  })
+);
 app.use("/uploads", express.static("uploads"));
 
 app.use(express.json());
