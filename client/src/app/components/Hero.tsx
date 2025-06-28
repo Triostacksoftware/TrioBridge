@@ -49,11 +49,11 @@ const Hero = () => {
               <FaUsersCog className="text-blue-600 text-2xl mb-1" />
               On-Boarding
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex hidden lg:block flex-col items-center">
               <FaGraduationCap className="text-purple-600 text-2xl mb-1" />
               Skill Training
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex hidden lg:block flex-col items-center">
               <FaRocket className="text-pink-500 text-2xl mb-1" />
               Performance Boost
             </div>
