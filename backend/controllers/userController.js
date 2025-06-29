@@ -45,9 +45,11 @@ export const getAllUsers = async (req, res) => {
 };
 
 // 🔘 Update User by ID
+
 export const updateUser = async (req, res) => {
   try {
     console.log("Hello");
+
     const allowedFields = [
       "eid",
       "name",
@@ -59,11 +61,17 @@ export const updateUser = async (req, res) => {
     ];
     const updates = {};
 
-    allowedFields.forEach((field) => {
+    for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
+        // Special handling for password hashing
+        if (field === "password") {
+          const salt = await bcrypt.genSalt(10);
+          updates[field] = await bcrypt.hash(req.body[field], salt);
+        } else {
+          updates[field] = req.body[field];
+        }
       }
-    });
+    }
 
     if (req.files?.length) {
       updates.documents = req.files.map((f) => f.filename);
@@ -72,6 +80,7 @@ export const updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, updates, {
       new: true,
     });
+
     res.json({ message: "User updated", user });
   } catch (err) {
     res.status(400).json({ error: err.message });
