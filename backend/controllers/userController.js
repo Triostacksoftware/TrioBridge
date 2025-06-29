@@ -47,6 +47,7 @@ export const getAllUsers = async (req, res) => {
 // 🔘 Update User by ID
 export const updateUser = async (req, res) => {
   try {
+    console.log("Hello");
     const allowedFields = [
       "eid",
       "name",

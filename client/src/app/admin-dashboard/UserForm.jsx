@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL;
@@ -21,7 +22,9 @@ export default function UserForm() {
   const handleEIDSearch = async () => {
     if (!form.eid.trim()) return alert("Enter a valid EID");
     try {
-      const res = await fetch(`${API_URL}api/users/view`);
+      const res = await fetch(`${API_URL}api/users/view`, {
+        credentials: "include",
+      });
       const data = await res.json();
 
       const found = data.find((u) => u.eid === form.eid);
@@ -68,11 +71,13 @@ export default function UserForm() {
         : `${API_URL}api/users/add`;
 
     const res = await fetch(endpoint, {
-      method: "POST",
+      method: mode === "edit" ? "PUT" : "POST",
       body: formData,
+      credentials: "include", // ✅ Ensure cookie is sent
     });
 
     const data = await res.json();
+
     if (res.ok) {
       alert(mode === "edit" ? "User updated successfully!" : "User added!");
       setForm({
@@ -104,6 +109,7 @@ export default function UserForm() {
         <button
           onClick={handleEIDSearch}
           className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          type="button"
         >
           Find
         </button>
