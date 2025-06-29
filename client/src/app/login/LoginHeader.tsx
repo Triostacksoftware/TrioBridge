@@ -1,9 +1,7 @@
 "use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 const LoginHeader = () => {
@@ -40,15 +38,18 @@ const LoginHeader = () => {
   return (
     <header className="w-full bg-white border-b border-gray-200 shadow-sm px-6 py-3 flex items-center justify-between">
       {/* Logo */}
-      <div className="flex items-center gap-2">
-        <Link href={"/"}>
-          <Image
-            src="/logo3.png" // ✅ Replace with your actual white BG-less logo
-            alt="Triobridge Logo"
-            width={140}
-            height={140}
-          />{" "}
-        </Link>
+      <div
+        className="flex items-center gap-2"
+        onClick={() => {
+          router.push("/");
+        }}
+      >
+        <Image
+          src="/logo3.png" // ✅ Replace with your actual white BG-less logo
+          alt="Triobridge Logo"
+          width={140}
+          height={140}
+        />{" "}
       </div>
 
       {/* Profile */}

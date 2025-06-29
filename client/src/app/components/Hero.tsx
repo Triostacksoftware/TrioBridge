@@ -2,8 +2,10 @@
 import React from "react";
 import Image from "next/image";
 import { FaUsersCog, FaGraduationCap, FaRocket } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
+  const router = useRouter();
   return (
     <section className="bg-gradient-to-br from-[#f5f0ff] to-[#e3f0ff] min-h-[90vh] flex items-center">
       <div className="max-w-6xl mx-auto px-3 grid md:grid-cols-2 gap-y-12 items-center">
@@ -34,7 +36,10 @@ const Hero = () => {
 
           {/* CTA */}
           <div className="flex gap-4 mt-6">
-            <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full shadow hover:scale-105 transition font-medium">
+            <button
+              onClick={() => router.push("/login")}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full shadow hover:scale-105 transition font-medium"
+            >
               Get Started
             </button>
             <button
@@ -53,16 +58,16 @@ const Hero = () => {
           {/* Features */}
 
           <div className=" flex space-x-8 lg:space-x-20  mt-16 lg:mt-10 text-sm text-gray-600">
-            <div className="flex hidden lg:block flex-col items-center ml-2">
-              <FaUsersCog className="text-blue-600 text-2xl mb-1" />
+            <div className="flex flex-col items-center ml-2">
+              <FaUsersCog className="text-blue-600 text-2xl mb-1 text-center" />
               On-Boarding
             </div>
-            <div className="flex hidden lg:block flex-col items-center">
-              <FaGraduationCap className="text-purple-600 text-2xl mb-1" />
+            <div className="flex  flex-col items-center">
+              <FaGraduationCap className="text-purple-600 text-2xl mb-1 text-center" />
               Skill Training
             </div>
-            <div className="flex hidden lg:block flex-col items-center">
-              <FaRocket className="text-pink-500 text-2xl mb-1" />
+            <div className="flex flex-col items-center">
+              <FaRocket className="text-pink-500 text-2xl mb-1 text-center" />
               Performance Boost
             </div>
           </div>
