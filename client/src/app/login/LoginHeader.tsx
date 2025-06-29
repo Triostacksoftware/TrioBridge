@@ -38,18 +38,15 @@ const LoginHeader = () => {
   return (
     <header className="w-full bg-white border-b border-gray-200 shadow-sm px-6 py-3 flex items-center justify-between">
       {/* Logo */}
-      <div
-        className="flex items-center gap-2"
-        onClick={() => {
-          router.push("/");
-        }}
-      >
-        <Image
-          src="/logo3.png" // ✅ Replace with your actual white BG-less logo
-          alt="Triobridge Logo"
-          width={140}
-          height={140}
-        />{" "}
+      <div className="flex items-center gap-2">
+        <a href="/" target="_blank">
+          <Image
+            src="/logo3.png" // ✅ Replace with your actual white BG-less logo
+            alt="Triobridge Logo"
+            width={140}
+            height={140}
+          />{" "}
+        </a>
       </div>
 
       {/* Profile */}
