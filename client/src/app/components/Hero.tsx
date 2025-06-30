@@ -57,18 +57,20 @@ const Hero = () => {
 
           {/* Features */}
 
-          <div className=" flex space-x-8 lg:space-x-20  mt-16 lg:mt-10 text-sm text-gray-600">
-            <div className="flex flex-col items-center ml-2">
-              <FaUsersCog className="text-blue-600 text-2xl mb-1 text-center" />
-              On-Boarding
-            </div>
-            <div className="flex  flex-col items-center">
-              <FaGraduationCap className="text-purple-600 text-2xl mb-1 text-center" />
-              Skill Training
-            </div>
-            <div className="flex flex-col items-center">
-              <FaRocket className="text-pink-500 text-2xl mb-1 text-center" />
-              Performance Boost
+          <div className="hidden lg:block">
+            <div className=" flex space-x-8 lg:space-x-20  mt-16 lg:mt-10 text-sm text-gray-600">
+              <div className="flex flex-col items-center ml-2">
+                <FaUsersCog className="text-blue-600 text-2xl mb-1 text-center" />
+                On-Boarding
+              </div>
+              <div className="flex  flex-col items-center">
+                <FaGraduationCap className="text-purple-600 text-2xl mb-1 text-center" />
+                Skill Training
+              </div>
+              <div className="flex flex-col items-center">
+                <FaRocket className="text-pink-500 text-2xl mb-1 text-center" />
+                Performance Boost
+              </div>
             </div>
           </div>
         </div>
