@@ -23,7 +23,7 @@ const Hero = () => {
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl mt-3 md:text-[6.9vmin] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-blue-700 leading-normal lg:leading-[8vmin]">
+          <h1 className="text-4xl mt-3 md:text-[6.9vmin] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-blue-700 leading-normal lg:leading-[9.8vmin]">
             Empower People Excellence <br /> with{" "}
             <span className="text-blue-700">TrioBridge</span>
           </h1>
